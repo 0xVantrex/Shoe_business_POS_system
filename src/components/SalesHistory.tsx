@@ -6,7 +6,6 @@ import {
   ShoppingBag,
   DollarSign,
   Package,
-  User,
   Download,
   TrendingUp,
   RefreshCw,
