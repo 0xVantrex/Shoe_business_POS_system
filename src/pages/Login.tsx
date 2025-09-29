@@ -1,16 +1,15 @@
-<<<<<<< HEAD
-import { useState  } from "react";
-import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock, LogIn, AlertCircle, CheckCircle } from "lucide-react";
-import { supabase } from '../supabaseClient'
-=======
 import { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock, LogIn, AlertCircle, CheckCircle } from "lucide-react";
-import { doc, getDoc } from "firebase/firestore";
->>>>>>> 090fd91 (Add Login.tsx file)
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  LogIn,
+  AlertCircle,
+  CheckCircle,
+} from "lucide-react";
+import { supabase } from "../supabaseClient";
 
 interface FormErrors {
   email?: string;
@@ -21,7 +20,7 @@ interface FormErrors {
 export default function Login() {
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
+    password: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -51,117 +50,64 @@ export default function Login() {
   };
 
   const handleInputChange = (field: keyof typeof formData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
+    setFormData((prev) => ({ ...prev, [field]: value }));
+
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
     // Clear general error when user modifies any field
     if (errors.general) {
-      setErrors(prev => ({ ...prev, general: undefined }));
+      setErrors((prev) => ({ ...prev, general: undefined }));
     }
   };
 
-<<<<<<< HEAD
-const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
-
-  if (!validateForm()) return;
-
-  setIsLoading(true);
-  try {
-    // 1. Sign in
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: formData.email,
-      password: formData.password,
-    });
-    if (error) throw error;
-
-    const user = data.user;
-    if (!user) throw new Error("No user returned from login");
-
-    // 2. Fetch role from users table
-    const { data: userData, error: roleError } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (roleError) throw roleError;
-    const role = userData?.role || "cashier";
-
-    setSuccess(true);
-
-    // 3. Redirect based on role
-    setTimeout(() => {
-      if (role === "admin") {
-        navigate("/dashboard");
-      } else {
-        navigate("/sales"); // or wherever you want cashiers to land
-      }
-    }, 1500);
-  } catch (err: any) {
-    setErrors({ general: err.message || "Failed to sign in. Please try again." });
-    return; // 🔥 ensures success screen doesn't flash
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-=======
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setIsLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      // 1. Sign in
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+      if (error) throw error;
+
+      const user = data.user;
+      if (!user) throw new Error("No user returned from login");
+
+      // 2. Fetch role from users table
+      const { data: userData, error: roleError } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+      if (roleError) throw roleError;
+      const role = userData?.role || "cashier";
+
       setSuccess(true);
-      
-      // Add a small delay to show success state
+
+      // 3. Redirect based on role
       setTimeout(() => {
-        navigate("/dashboard");
+        if (role === "admin") {
+          navigate("/dashboard");
+        } else {
+          navigate("/sales"); // or wherever you want cashiers to land
+        }
       }, 1500);
     } catch (err: any) {
-      let errorMessage = "Failed to sign in. Please try again.";
-      
-      // Handle different Firebase error types
-      switch (err.code) {
-        case "auth/user-not-found":
-          errorMessage = "No account found with this email address";
-          setErrors({ email: errorMessage });
-          break;
-        case "auth/wrong-password":
-          errorMessage = "Incorrect password";
-          setErrors({ password: errorMessage });
-          break;
-        case "auth/invalid-email":
-          errorMessage = "Invalid email address";
-          setErrors({ email: errorMessage });
-          break;
-        case "auth/user-disabled":
-          errorMessage = "This account has been disabled";
-          setErrors({ general: errorMessage });
-          break;
-        case "auth/too-many-requests":
-          errorMessage = "Too many failed attempts. Please try again later";
-          setErrors({ general: errorMessage });
-          break;
-        case "auth/invalid-credential":
-          errorMessage = "Invalid email or password";
-          setErrors({ general: errorMessage });
-          break;
-        default:
-          setErrors({ general: errorMessage });
-      }
+      setErrors({
+        general: err.message || "Failed to sign in. Please try again.",
+      });
+      return; // 🔥 ensures success screen doesn't flash
     } finally {
       setIsLoading(false);
     }
   };
->>>>>>> 090fd91 (Add Login.tsx file)
-
 
   if (success) {
     return (
@@ -170,28 +116,16 @@ const handleLogin = async (e: React.FormEvent) => {
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back!</h2>
-          <p className="text-gray-600 mb-4">Successfully signed in. Redirecting...</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Welcome Back!
+          </h2>
+          <p className="text-gray-600 mb-4">
+            Successfully signed in. Redirecting...
+          </p>
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto"></div>
         </div>
       </div>
     );
-<<<<<<< HEAD
-}
-
-return (
-  <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-emerald-50 via-blue-50 to-indigo-50 p-4">
-    <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl w-full max-w-md border border-white/20">
-      <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-          <LogIn className="w-8 h-8 text-white" />
-        </div>
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
-          Welcome Back
-        </h2>
-        <p className="text-gray-600 mt-2">Sign in to your account</p>
-      </div>
-=======
   }
 
   return (
@@ -206,7 +140,6 @@ return (
           </h2>
           <p className="text-gray-600 mt-2">Sign in to your account</p>
         </div>
->>>>>>> 090fd91 (Add Login.tsx file)
 
         {/* General Error */}
         {errors.general && (
@@ -269,7 +202,11 @@ return (
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
-                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
               </button>
             </div>
             {errors.password && (
@@ -302,7 +239,6 @@ return (
           <p className="text-gray-600 text-sm">
             Don't have an account?{" "}
             <button
-             
               onClick={() => navigate("/signup")}
               className="text-emerald-600 hover:text-emerald-700 font-semibold hover:underline transition-colors duration-200"
             >
