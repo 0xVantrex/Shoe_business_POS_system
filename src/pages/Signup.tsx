@@ -1,9 +1,15 @@
 import { useState } from "react";
-import { Eye, EyeOff, Mail, Lock, User, AlertCircle, CheckCircle } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  User,
+  AlertCircle,
+  CheckCircle,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
-
-
 
 interface FormErrors {
   email?: string;
@@ -15,7 +21,7 @@ export default function Signup() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
   const navigate = useNavigate();
   const [errors, setErrors] = useState<FormErrors>({});
@@ -40,7 +46,8 @@ export default function Signup() {
     } else if (formData.password.length < 8) {
       newErrors.password = "Password must be at least 8 characters";
     } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-      newErrors.password = "Password must contain uppercase, lowercase, and number";
+      newErrors.password =
+        "Password must contain uppercase, lowercase, and number";
     }
 
     // Confirm password validation
@@ -55,11 +62,11 @@ export default function Signup() {
   };
 
   const handleInputChange = (field: keyof typeof formData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
+    setFormData((prev) => ({ ...prev, [field]: value }));
+
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
   };
 
@@ -76,48 +83,53 @@ export default function Signup() {
   const getPasswordStrengthLabel = (strength: number) => {
     switch (strength) {
       case 0:
-      case 1: return { label: "Weak", color: "bg-red-500" };
-      case 2: return { label: "Fair", color: "bg-yellow-500" };
-      case 3: return { label: "Good", color: "bg-blue-500" };
+      case 1:
+        return { label: "Weak", color: "bg-red-500" };
+      case 2:
+        return { label: "Fair", color: "bg-yellow-500" };
+      case 3:
+        return { label: "Good", color: "bg-blue-500" };
       case 4:
-      case 5: return { label: "Strong", color: "bg-green-500" };
-      default: return { label: "Weak", color: "bg-red-500" };
+      case 5:
+        return { label: "Strong", color: "bg-green-500" };
+      default:
+        return { label: "Weak", color: "bg-red-500" };
     }
   };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!validateForm()) return;
 
     setIsLoading(true);
     try {
-    const {  error } = await supabase.auth.signUp({
-      email: formData.email,
-      password: formData.password,
-    });
+      // 1. Create account in Supabase Auth
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+      });
+
       if (error) throw error;
+      const user = data.user;
+
+      // 2. Insert into your custom users table
+      if (user) {
+        const { error: insertError } = await supabase
+          .from("users")
+          .insert([{ id: user.id, email: user.email, role: "cashier" }]);
+
+        if (insertError) throw insertError;
+      }
+
+      // 3. Success flow
       setSuccess(true);
-      
       setTimeout(() => {
         navigate("/dashboard");
       }, 1500);
     } catch (err: any) {
-      let errorMessage = "Failed to create account. Please try again.";
-      
-      // Handle different error types (replace with actual Firebase error codes)
-      if (err.code === "auth/email-already-in-use") {
-        errorMessage = "An account with this email already exists";
-        setErrors({ email: errorMessage });
-      } else if (err.code === "auth/weak-password") {
-        errorMessage = "Password is too weak";
-        setErrors({ password: errorMessage });
-      } else if (err.code === "auth/invalid-email") {
-        errorMessage = "Invalid email address";
-        setErrors({ email: errorMessage });
-      } else {
-        setErrors({ email: errorMessage });
-      }
+      let errorMessage =
+        err.message || "Failed to create account. Please try again.";
+      setErrors({ email: errorMessage });
     } finally {
       setIsLoading(false);
     }
@@ -133,8 +145,12 @@ export default function Signup() {
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Account Created!</h2>
-          <p className="text-gray-600 mb-4">Welcome! Redirecting you to your dashboard...</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Account Created!
+          </h2>
+          <p className="text-gray-600 mb-4">
+            Welcome! Redirecting you to your dashboard...
+          </p>
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto"></div>
         </div>
       </div>
@@ -205,15 +221,21 @@ export default function Signup() {
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
-                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
               </button>
             </div>
-            
+
             {formData.password && (
               <div className="mt-2">
                 <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
                   <span>Password strength</span>
-                  <span className={`font-medium ${strengthInfo.color.replace('bg-', 'text-')}`}>
+                  <span
+                    className={`font-medium ${strengthInfo.color.replace("bg-", "text-")}`}
+                  >
                     {strengthInfo.label}
                   </span>
                 </div>
@@ -225,7 +247,7 @@ export default function Signup() {
                 </div>
               </div>
             )}
-            
+
             {errors.password && (
               <div className="flex items-center mt-2 text-red-600 text-sm">
                 <AlertCircle className="w-4 h-4 mr-1" />
@@ -245,7 +267,9 @@ export default function Signup() {
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="Confirm your password"
                 value={formData.confirmPassword}
-                onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("confirmPassword", e.target.value)
+                }
                 className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all duration-200 ${
                   errors.confirmPassword
                     ? "border-red-300 focus:ring-red-500/20 focus:border-red-500"
@@ -257,7 +281,11 @@ export default function Signup() {
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
-                {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                {showConfirmPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
               </button>
             </div>
             {errors.confirmPassword && (
@@ -290,7 +318,7 @@ export default function Signup() {
           <p className="text-gray-600 text-sm">
             Already have an account?{" "}
             <button
-              onClick={() => console.log("Navigate to login")}
+              onClick={() => navigate("/login")}
               className="text-emerald-600 hover:text-emerald-700 font-semibold hover:underline transition-colors duration-200"
             >
               Sign in here
