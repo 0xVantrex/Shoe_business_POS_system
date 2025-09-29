@@ -140,9 +140,7 @@ export default function Cart({ cart, setCart }: CartProps) {
   );
 }
 
-// --------------------------
-// Subcomponents
-// --------------------------
+
 const Header = ({ totalItems }: { totalItems: number }) => (
   <div className="flex items-center gap-3 mb-6">
     <div className="p-2 bg-emerald-500/20 rounded-xl">
