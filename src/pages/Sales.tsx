@@ -2,14 +2,12 @@ import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import { ShoppingCart, Plus, Package, Search } from "lucide-react";
 import Cart from "../components/Cart";
-import SalesHistory from "../components/SalesHistory";
 
 export default function Sales() {
   const [cart, setCart] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterCategory, setFilterCategory] = useState("all");
 
   // Fetch products from Supabase
   useEffect(() => {
@@ -57,7 +55,7 @@ export default function Sales() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
+    <div className="min-h-screen pt-16 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -157,13 +155,6 @@ export default function Sales() {
           {/* Cart */}
           <div className="lg:col-span-1">
             <Cart cart={cart} setCart={setCart} />
-          </div>
-
-          {/* Sales History */}
-          <div className="lg:col-span-3">
-            <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 hover:border-slate-600/50 transition-all duration-300">
-              <SalesHistory />
-            </div>
           </div>
         </div>
       </div>
