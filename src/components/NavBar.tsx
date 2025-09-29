@@ -7,7 +7,7 @@ export default function TopNavbar() {
   const location = useLocation();
 
   const menuItems = [
-    { path: "/dashboard", label: "Dashboard", icon: BarChart3 },
+    { path: "/", label: "Dashboard", icon: BarChart3 },
     { path: "/inventory", label: "Inventory", icon: Package },
     { path: "/sales", label: "Sales", icon: TrendingUp },
     { path: "/sales-history", label: "Sales History", icon: History }, // NEW
