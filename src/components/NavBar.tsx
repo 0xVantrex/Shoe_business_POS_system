@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { BarChart3, Package, TrendingUp, Menu } from "lucide-react";
+import { BarChart3, Package, TrendingUp, Menu, LogIn, History } from "lucide-react";
 
 export default function TopNavbar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -10,6 +10,8 @@ export default function TopNavbar() {
     { path: "/dashboard", label: "Dashboard", icon: BarChart3 },
     { path: "/inventory", label: "Inventory", icon: Package },
     { path: "/sales", label: "Sales", icon: TrendingUp },
+    { path: "/sales-history", label: "Sales History", icon: History }, // NEW
+    { path: "/login", label: "Sign In", icon: LogIn }, // NEW
   ];
 
   const isActivePath = (path: string) => location.pathname.startsWith(path);

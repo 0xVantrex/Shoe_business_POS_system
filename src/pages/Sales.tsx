@@ -8,6 +8,8 @@ export default function Sales() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 6;
 
   // Fetch products from Supabase
   useEffect(() => {
@@ -44,6 +46,10 @@ export default function Sales() {
   // Filter products based on search term
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const paginatedProducts = filteredProducts.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage
   );
 
   const formatCurrency = (amount: number) => {
@@ -112,7 +118,7 @@ export default function Sales() {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                {filteredProducts.map((product) => (
+                {paginatedProducts.map((product) => (
                   <div
                     key={product.id}
                     className="group bg-slate-900/50 border border-slate-700/50 rounded-xl p-4 hover:border-emerald-500/30 hover:bg-slate-800/50 transition-all duration-300 cursor-pointer transform hover:scale-105"
@@ -150,6 +156,34 @@ export default function Sales() {
                 ))}
               </div>
             )}
+          </div>
+          {/* Pagination Controls */}
+          <div className="flex justify-between items-center mt-6">
+            <button
+              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+              disabled={page === 1}
+              className="px-4 py-2 bg-slate-700/50 text-slate-300 rounded-xl disabled:opacity-50 hover:bg-slate-600/50 transition"
+            >
+              Previous
+            </button>
+            <span className="text-slate-400 text-sm">
+              Page {page} of {Math.ceil(filteredProducts.length / itemsPerPage)}
+            </span>
+            <button
+              onClick={() =>
+                setPage((prev) =>
+                  prev < Math.ceil(filteredProducts.length / itemsPerPage)
+                    ? prev + 1
+                    : prev
+                )
+              }
+              disabled={
+                page >= Math.ceil(filteredProducts.length / itemsPerPage)
+              }
+              className="px-4 py-2 bg-slate-700/50 text-slate-300 rounded-xl disabled:opacity-50 hover:bg-slate-600/50 transition"
+            >
+              Next
+            </button>
           </div>
 
           {/* Cart */}

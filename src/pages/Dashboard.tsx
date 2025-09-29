@@ -1,7 +1,6 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
-import SalesHistory from "../components/SalesHistory";
 import {
   BarChart,
   Bar,
