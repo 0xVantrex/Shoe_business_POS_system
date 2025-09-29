@@ -9,6 +9,7 @@ interface CartItem {
   qty: number;
   stock: number;
   sellingPrice?: number;
+  costPrice: number;
 }
 
 interface CartProps {
@@ -62,7 +63,7 @@ export default function Cart({ cart, setCart }: CartProps) {
         quantity: item.qty,
         unit_price: item.price,
         total: item.price * item.qty,
-        profit: ((item.sellingPrice || item.price) - item.price) * item.qty,
+        profit: ((item.sellingPrice || item.price) - item.costPrice) * item.qty,
         payment_method: "Cash",
         customer: "Walk-in",
         discount: 0,
