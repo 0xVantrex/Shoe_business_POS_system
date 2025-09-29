@@ -1,7 +1,16 @@
+<<<<<<< HEAD
 import { useState  } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock, LogIn, AlertCircle, CheckCircle } from "lucide-react";
 import { supabase } from '../supabaseClient'
+=======
+import { useState } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
+import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff, Mail, Lock, LogIn, AlertCircle, CheckCircle } from "lucide-react";
+import { doc, getDoc } from "firebase/firestore";
+>>>>>>> 090fd91 (Add Login.tsx file)
 
 interface FormErrors {
   email?: string;
@@ -54,6 +63,7 @@ export default function Login() {
     }
   };
 
+<<<<<<< HEAD
 const handleLogin = async (e: React.FormEvent) => {
   e.preventDefault();
 
@@ -99,6 +109,58 @@ const handleLogin = async (e: React.FormEvent) => {
   }
 };
 
+=======
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+    try {
+      await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      setSuccess(true);
+      
+      // Add a small delay to show success state
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1500);
+    } catch (err: any) {
+      let errorMessage = "Failed to sign in. Please try again.";
+      
+      // Handle different Firebase error types
+      switch (err.code) {
+        case "auth/user-not-found":
+          errorMessage = "No account found with this email address";
+          setErrors({ email: errorMessage });
+          break;
+        case "auth/wrong-password":
+          errorMessage = "Incorrect password";
+          setErrors({ password: errorMessage });
+          break;
+        case "auth/invalid-email":
+          errorMessage = "Invalid email address";
+          setErrors({ email: errorMessage });
+          break;
+        case "auth/user-disabled":
+          errorMessage = "This account has been disabled";
+          setErrors({ general: errorMessage });
+          break;
+        case "auth/too-many-requests":
+          errorMessage = "Too many failed attempts. Please try again later";
+          setErrors({ general: errorMessage });
+          break;
+        case "auth/invalid-credential":
+          errorMessage = "Invalid email or password";
+          setErrors({ general: errorMessage });
+          break;
+        default:
+          setErrors({ general: errorMessage });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+>>>>>>> 090fd91 (Add Login.tsx file)
 
 
   if (success) {
@@ -114,6 +176,7 @@ const handleLogin = async (e: React.FormEvent) => {
         </div>
       </div>
     );
+<<<<<<< HEAD
 }
 
 return (
@@ -128,6 +191,22 @@ return (
         </h2>
         <p className="text-gray-600 mt-2">Sign in to your account</p>
       </div>
+=======
+  }
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-emerald-50 via-blue-50 to-indigo-50 p-4">
+      <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl w-full max-w-md border border-white/20">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <LogIn className="w-8 h-8 text-white" />
+          </div>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
+            Welcome Back
+          </h2>
+          <p className="text-gray-600 mt-2">Sign in to your account</p>
+        </div>
+>>>>>>> 090fd91 (Add Login.tsx file)
 
         {/* General Error */}
         {errors.general && (
