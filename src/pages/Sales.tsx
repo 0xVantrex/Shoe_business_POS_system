@@ -49,9 +49,9 @@ export default function Sales() {
   );
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-KE', {
-      style: 'currency',
-      currency: 'KES',
+    return new Intl.NumberFormat("en-KE", {
+      style: "currency",
+      currency: "KES",
       minimumFractionDigits: 0,
     }).format(amount);
   };
@@ -65,7 +65,9 @@ export default function Sales() {
             <ShoppingCart className="h-10 w-10 text-emerald-400" />
             Sales Center
           </h1>
-          <p className="text-slate-400 text-lg">Manage your sales and transactions</p>
+          <p className="text-slate-400 text-lg">
+            Manage your sales and transactions
+          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -76,7 +78,7 @@ export default function Sales() {
                 <Package className="h-6 w-6 text-emerald-400" />
                 <h2 className="text-2xl font-bold text-white">Products</h2>
               </div>
-              
+
               {/* Search Bar */}
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -105,7 +107,9 @@ export default function Sales() {
                   {searchTerm ? "No products found" : "No products available"}
                 </p>
                 <p className="text-slate-500 text-sm">
-                  {searchTerm ? "Try adjusting your search terms" : "Add some products to get started"}
+                  {searchTerm
+                    ? "Try adjusting your search terms"
+                    : "Add some products to get started"}
                 </p>
               </div>
             ) : (
@@ -132,8 +136,8 @@ export default function Sales() {
                           )}
                         </div>
                       </div>
-                      
-                      <button 
+
+                      <button
                         className="flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-4 py-3 rounded-xl hover:from-emerald-500 hover:to-emerald-400 transition-all duration-300 shadow-lg hover:shadow-xl font-medium group-hover:scale-105 transform"
                         onClick={(e) => {
                           e.stopPropagation();
