@@ -1,9 +1,7 @@
 import { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock, LogIn, AlertCircle, CheckCircle } from "lucide-react";
-import { doc, getDoc } from "firebase/firestore";
+import { supabase } from '../supabaseClient'
 
 interface FormErrors {
   email?: string;
@@ -63,7 +61,11 @@ export default function Login() {
 
     setIsLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      const {  error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+      if (error) throw error;
       setSuccess(true);
       
       // Add a small delay to show success state
@@ -71,40 +73,8 @@ export default function Login() {
         navigate("/dashboard");
       }, 1500);
     } catch (err: any) {
-      let errorMessage = "Failed to sign in. Please try again.";
-      
-      // Handle different Firebase error types
-      switch (err.code) {
-        case "auth/user-not-found":
-          errorMessage = "No account found with this email address";
-          setErrors({ email: errorMessage });
-          break;
-        case "auth/wrong-password":
-          errorMessage = "Incorrect password";
-          setErrors({ password: errorMessage });
-          break;
-        case "auth/invalid-email":
-          errorMessage = "Invalid email address";
-          setErrors({ email: errorMessage });
-          break;
-        case "auth/user-disabled":
-          errorMessage = "This account has been disabled";
-          setErrors({ general: errorMessage });
-          break;
-        case "auth/too-many-requests":
-          errorMessage = "Too many failed attempts. Please try again later";
-          setErrors({ general: errorMessage });
-          break;
-        case "auth/invalid-credential":
-          errorMessage = "Invalid email or password";
-          setErrors({ general: errorMessage });
-          break;
-        default:
-          setErrors({ general: errorMessage });
-      }
-    } finally {
-      setIsLoading(false);
-    }
+      setErrors({ general: err.message || "Failed to sign in. Please try again." })
+    
   };
 
 
@@ -122,6 +92,7 @@ export default function Login() {
       </div>
     );
   }
+}
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-emerald-50 via-blue-50 to-indigo-50 p-4">
