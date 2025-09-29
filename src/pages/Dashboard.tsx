@@ -419,9 +419,6 @@ export default function Dashboard() {
           </ChartCard>
         </div>
 
-        <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-4 sm:p-6 hover:border-slate-600/50 transition-all duration-300">
-          <SalesHistory />
-        </div>
       </div>
     </div>
   );
