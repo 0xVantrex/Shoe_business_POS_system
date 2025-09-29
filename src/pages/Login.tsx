@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState  } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock, LogIn, AlertCircle, CheckCircle } from "lucide-react";
 import { supabase } from '../supabaseClient'
@@ -54,28 +54,51 @@ export default function Login() {
     }
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) return;
+const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    setIsLoading(true);
-    try {
-      const {  error } = await supabase.auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password,
-      });
-      if (error) throw error;
-      setSuccess(true);
-      
-      // Add a small delay to show success state
-      setTimeout(() => {
+  if (!validateForm()) return;
+
+  setIsLoading(true);
+  try {
+    // 1. Sign in
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: formData.email,
+      password: formData.password,
+    });
+    if (error) throw error;
+
+    const user = data.user;
+    if (!user) throw new Error("No user returned from login");
+
+    // 2. Fetch role from users table
+    const { data: userData, error: roleError } = await supabase
+      .from("users")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (roleError) throw roleError;
+    const role = userData?.role || "cashier";
+
+    setSuccess(true);
+
+    // 3. Redirect based on role
+    setTimeout(() => {
+      if (role === "admin") {
         navigate("/dashboard");
-      }, 1500);
-    } catch (err: any) {
-      setErrors({ general: err.message || "Failed to sign in. Please try again." })
-    
-  };
+      } else {
+        navigate("/sales"); // or wherever you want cashiers to land
+      }
+    }, 1500);
+  } catch (err: any) {
+    setErrors({ general: err.message || "Failed to sign in. Please try again." });
+    return; // 🔥 ensures success screen doesn't flash
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
 
   if (success) {
@@ -91,21 +114,20 @@ export default function Login() {
         </div>
       </div>
     );
-  }
 }
 
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-emerald-50 via-blue-50 to-indigo-50 p-4">
-      <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl w-full max-w-md border border-white/20">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-            <LogIn className="w-8 h-8 text-white" />
-          </div>
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
-            Welcome Back
-          </h2>
-          <p className="text-gray-600 mt-2">Sign in to your account</p>
+return (
+  <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-emerald-50 via-blue-50 to-indigo-50 p-4">
+    <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl w-full max-w-md border border-white/20">
+      <div className="text-center mb-8">
+        <div className="w-16 h-16 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <LogIn className="w-8 h-8 text-white" />
         </div>
+        <h2 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
+          Welcome Back
+        </h2>
+        <p className="text-gray-600 mt-2">Sign in to your account</p>
+      </div>
 
         {/* General Error */}
         {errors.general && (
