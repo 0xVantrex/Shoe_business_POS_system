@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
-import { ShoppingCart, Plus, Package, Search, Filter } from "lucide-react";
+import { ShoppingCart, Plus, Package, Search } from "lucide-react";
 import Cart from "../components/Cart";
 import SalesHistory from "../components/SalesHistory";
-import SalesForm from "../components/SalesForm";
 
 export default function Sales() {
   const [cart, setCart] = useState<any[]>([]);
@@ -154,13 +153,6 @@ export default function Sales() {
           {/* Cart */}
           <div className="lg:col-span-1">
             <Cart cart={cart} setCart={setCart} />
-          </div>
-
-          {/* Manual Sale Form */}
-          <div className="lg:col-span-3">
-            <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 hover:border-slate-600/50 transition-all duration-300">
-              <SalesForm />
-            </div>
           </div>
 
           {/* Sales History */}
