@@ -124,7 +124,7 @@ export default function Signup() {
       // 3. Success flow
       setSuccess(true);
       setTimeout(() => {
-        navigate("/dashboard");
+        navigate("/");
       }, 1500);
     } catch (err: any) {
       let errorMessage =
