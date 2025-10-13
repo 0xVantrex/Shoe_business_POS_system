@@ -84,7 +84,7 @@ export default function Login() {
         .from("users")
         .select("role")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
       if (roleError) throw roleError;
       const role = userData?.role || "cashier";
@@ -96,7 +96,7 @@ export default function Login() {
         if (role === "admin") {
           navigate("/dashboard");
         } else {
-          navigate("/sales"); // or wherever you want cashiers to land
+          navigate("/sales"); 
         }
       }, 1500);
     } catch (err: any) {
