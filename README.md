@@ -7,7 +7,7 @@ Built for **speed, efficiency, and usability**, this system handles inventory, s
 
 ---
 
-## Features ✨
+## Features 
 
 - **Inventory Management**  
   Add, update, and delete products with categories, images, and details.
@@ -56,11 +56,11 @@ Visit http://localhost:5173 in your browser.
 Contributing
 This project is currently a solo grind — contributions are not open. But feel free to check out the code, learn, and reach out if you have questions.
 
-License 📄
+License 
 
 MIT License — freely use, modify, and distribute. Keep it legit.
 
-Author 👤
+Author 
 
 0xVantrex – Hacker, web developer, and sneakerpreneur.
 Check out my other projects: https://github.com/0xVantrex
