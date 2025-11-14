@@ -94,7 +94,7 @@ export default function Login() {
       // 3. Redirect based on role
       setTimeout(() => {
         if (role === "admin") {
-          navigate("/dashboard");
+          navigate("/inventory");
         } else {
           navigate("/sales"); 
         }
