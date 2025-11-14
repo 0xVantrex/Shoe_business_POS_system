@@ -125,6 +125,14 @@ export default function Sales() {
                     onClick={() => addToCart(product)}
                   >
                     <div className="flex flex-col h-full">
+                      {product.images && (
+                        <img
+                          src={product.images[0]}
+                          alt={product.name}
+                          className="w-full h-32 object-cover rounded-lg mb-4"
+                        />
+                      )
+                      }
                       <div className="flex-1 mb-4">
                         <h3 className="font-semibold text-white text-lg mb-2 group-hover:text-emerald-300 transition-colors duration-300">
                           {product.name}
