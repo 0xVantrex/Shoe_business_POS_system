@@ -430,34 +430,107 @@ export default function ProfessionalInventoryPOS() {
     };
   }, [sales, products]);
 
-  const updateProduct = async () => {
+  const updateProduct = async (e?: React.FormEvent | React.MouseEvent) => {
+    
+    if (e && typeof (e as any).preventDefault === "function") {
+      (e as any).preventDefault();
+    }
+
     if (!editingProduct) return;
 
+    if (!editingProduct.name.trim()) {
+      setUploadStatus({
+        type: "error",
+        message: "Please enter a product name",
+      });
+      return;
+    }
+
+    
+    const costPrice = Number((editingProduct as any).costPrice || 0);
+    const sellingPrice = Number((editingProduct as any).price || 0);
+    const stock = Number(editingProduct.stock) || 0;
+
+    if (costPrice <= 0 || sellingPrice <= 0) {
+      setUploadStatus({
+        type: "error",
+        message: "Prices must be greater than 0",
+      });
+      return;
+    }
+    if (sellingPrice < costPrice) {
+      setUploadStatus({
+        type: "error",
+        message: "Selling price cannot be less than cost price",
+      });
+      return;
+    }
+    if (stock < 0) {
+      setUploadStatus({
+        type: "error",
+        message: "Stock cannot be negative",
+      });
+      return;
+    }
+
+    setLoading(true);
+    setUploadProgress(0);
+    setUploadStatus({
+      type: "uploading",
+      message: "Updating product...",
+    });
+
     try {
+   
+      const imagesAny = (editingProduct as any).images as any[];
+      const existingImages = imagesAny.filter((img) => typeof img === "string") as string[];
+      const newImages = imagesAny.filter((img) => typeof img !== "string") as File[];
+      let uploadedNewImageUrls: string[] = [];
+
+      if (newImages.length > 0) {
+        uploadedNewImageUrls = await uploadImages(newImages);
+        if (uploadedNewImageUrls.length === 0) {
+          throw new Error("Image upload failed. Try again.");
+        }
+      }
+      const finalImageList = [...existingImages, ...uploadedNewImageUrls];
+
+      const updatedData = {
+        name: editingProduct.name.trim(),
+        price: Number(sellingPrice.toFixed(2)),
+        costPrice: Number(costPrice.toFixed(2)),
+        stock,
+        category: editingProduct.category,
+        images: finalImageList,
+        description: editingProduct.description?.trim() || null,
+        lowStockThreshold: editingProduct.lowStockThreshold || 5,
+        updated_at: new Date().toISOString(),
+      };
+
       const { error } = await supabase
         .from("products")
-        .update({
-          name: editingProduct.name,
-          price: editingProduct.price,
-          stock: editingProduct.stock,
-        })
+        .update(updatedData)
         .eq("id", editingProduct.id);
 
       if (error) throw error;
 
-      await fetchProducts();
       setUploadStatus({
         type: "success",
-        message: "Product updated successfully",
+        message: "Product updated successfully!",
       });
 
       setEditingProduct(null);
+
+      await fetchProducts();
     } catch (error: any) {
-      console.error("Update product error:", error);
+      console.error("Update product error: ", error);
       setUploadStatus({
         type: "error",
-        message: `Failed to update product: ${error.message}`,
+        message: `Failed to update product: ${error.message || "unknown error"}`,
       });
+    } finally {
+      setLoading(false);
+      setUploadProgress(0);
     }
   };
 
