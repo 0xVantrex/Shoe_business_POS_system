@@ -57,6 +57,8 @@ export default function ProfessionalInventoryPOS() {
   const [sales, setSales] = useState<Sale[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editImagePreviews, setEditImagePreviews] = useState<string[]>([]);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [uploadStatus, setUploadStatus] = useState<{
     type: "idle" | "uploading" | "success" | "error";
@@ -392,10 +394,12 @@ export default function ProfessionalInventoryPOS() {
     }
   };
 
-  // Placeholder for edit product
-  const handleEdit = (product: Product) => {
-    setEditingProduct(product);
-  };
+const handleEdit = (product: any) => {
+  setEditingProduct({ ...product, images: product.images || [] });
+  setEditImagePreviews(product.images || []);
+  setShowEditModal(true);
+};
+
 
   // Analytics
   const analytics = useMemo(() => {
@@ -1209,70 +1213,182 @@ export default function ProfessionalInventoryPOS() {
               })}
             </div>
           )}
-          {editingProduct && (
-            <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-              <div className="bg-slate-800 p-6 rounded-xl w-full max-w-md border border-slate-700">
-                <h2 className="text-xl font-bold text-white mb-4">
-                  Edit Product
-                </h2>
+          {showEditModal && editingProduct && (
+  <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="bg-slate-900 w-full max-w-xl rounded-2xl p-6 border border-slate-700 shadow-xl">
 
-                <input
-                  type="text"
-                  value={editingProduct.name}
-                  onChange={(e) =>
-                    setEditingProduct({
-                      ...editingProduct,
-                      name: e.target.value,
-                    })
-                  }
-                  className="w-full mb-3 p-2 rounded bg-slate-700 text-white"
-                  placeholder="Product Name"
+      <h2 className="text-2xl font-bold text-white mb-4">Edit Product</h2>
+
+      <form onSubmit={updateProduct} className="space-y-4">
+
+        {/* NAME */}
+        <div>
+          <label className="text-slate-300 text-sm">Product Name</label>
+          <input
+            type="text"
+            value={editingProduct.name}
+            onChange={(e) =>
+              setEditingProduct((prev: any) => ({
+                ...prev,
+                name: e.target.value,
+              }))
+            }
+            className="w-full p-2 bg-slate-800 rounded-lg border border-slate-700 text-white"
+          />
+        </div>
+
+        {/* PRICES */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="text-slate-300 text-sm">Cost Price</label>
+            <input
+              type="number"
+              value={editingProduct.costPrice}
+              onChange={(e) =>
+                setEditingProduct((prev: any) => ({
+                  ...prev,
+                  costPrice: e.target.value,
+                }))
+              }
+              className="w-full p-2 bg-slate-800 rounded-lg border border-slate-700 text-white"
+            />
+          </div>
+
+          <div>
+            <label className="text-slate-300 text-sm">Selling Price</label>
+            <input
+              type="number"
+              value={editingProduct.price}
+              onChange={(e) =>
+                setEditingProduct((prev: any) => ({
+                  ...prev,
+                  sellingPrice: e.target.value,
+                }))
+              }
+              className="w-full p-2 bg-slate-800 rounded-lg border border-slate-700 text-white"
+            />
+          </div>
+        </div>
+
+        {/* STOCK */}
+        <div>
+          <label className="text-slate-300 text-sm">Stock</label>
+          <input
+            type="number"
+            value={editingProduct.stock}
+            onChange={(e) =>
+              setEditingProduct((prev: any) => ({
+                ...prev,
+                stock: e.target.value,
+              }))
+            }
+            className="w-full p-2 bg-slate-800 rounded-lg border border-slate-700 text-white"
+          />
+        </div>
+
+        {/* CATEGORY */}
+        <div>
+          <label className="text-slate-300 text-sm">Category</label>
+          <select
+            value={editingProduct.category}
+            onChange={(e) =>
+              setEditingProduct((prev: any) => ({
+                ...prev,
+                category: e.target.value,
+              }))
+            }
+            className="w-full p-2 bg-slate-800 rounded-lg border border-slate-700 text-white"
+          >
+            <option value="Sneakers">Sneakers</option>
+          </select>
+        </div>
+
+        {/* DESCRIPTION */}
+        <div>
+          <label className="text-slate-300 text-sm">Description</label>
+          <textarea
+            value={editingProduct.description}
+            onChange={(e) =>
+              setEditingProduct((prev: any) => ({
+                ...prev,
+                description: e.target.value,
+              }))
+            }
+            className="w-full p-2 bg-slate-800 rounded-lg border border-slate-700 text-white h-24 resize-none"
+          />
+        </div>
+
+        {/* IMAGE UPLOAD */}
+        <div>
+          <label className="text-slate-300 text-sm">Images</label>
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={(e) => {
+              const files = Array.from(e.target.files || []);
+              const previews = files.map((f) => URL.createObjectURL(f));
+
+              setEditImagePreviews((prev) => [...prev, ...previews]);
+
+              setEditingProduct((prev: any) => ({
+                ...prev,
+                images: [...prev.images, ...files],
+              }));
+            }}
+            className="mt-2"
+          />
+
+          {/* PREVIEWS */}
+          <div className="grid grid-cols-3 gap-2 mt-3">
+            {editImagePreviews.map((img, idx) => (
+              <div key={idx} className="relative group">
+                <img
+                  src={img}
+                  className="w-full h-24 object-cover rounded-lg border border-slate-700"
                 />
-
-                <input
-                  type="number"
-                  value={editingProduct.price}
-                  onChange={(e) =>
-                    setEditingProduct({
-                      ...editingProduct,
-                      price: Number(e.target.value),
-                    })
-                  }
-                  className="w-full mb-3 p-2 rounded bg-slate-700 text-white"
-                  placeholder="Price"
-                />
-
-                <input
-                  type="number"
-                  value={editingProduct.stock}
-                  onChange={(e) =>
-                    setEditingProduct({
-                      ...editingProduct,
-                      stock: Number(e.target.value),
-                    })
-                  }
-                  className="w-full mb-3 p-2 rounded bg-slate-700 text-white"
-                  placeholder="Stock"
-                />
-
-                <div className="flex justify-end gap-3 mt-4">
-                  <button
-                    onClick={() => setEditingProduct(null)}
-                    className="px-3 py-2 bg-slate-600 text-white rounded"
-                  >
-                    Cancel
-                  </button>
-
-                  <button
-                    onClick={updateProduct}
-                    className="px-3 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
-                  >
-                    Save Changes
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    // Remove preview & remove image from product object
+                    setEditImagePreviews((prev) =>
+                      prev.filter((_, i) => i !== idx)
+                    );
+                    setEditingProduct((prev: any) => ({
+                      ...prev,
+                      images: prev.images.filter((_: any, i: number) => i !== idx),
+                    }));
+                  }}
+                  className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded opacity-80 hover:opacity-100"
+                >
+                  X
+                </button>
               </div>
-            </div>
-          )}
+            ))}
+          </div>
+        </div>
+
+        {/* ACTION BUTTONS */}
+        <div className="flex justify-end gap-3 mt-6">
+          <button
+            type="button"
+            onClick={() => setShowEditModal(false)}
+            className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-500"
+          >
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
+
         </div>
       </div>
     </div>
