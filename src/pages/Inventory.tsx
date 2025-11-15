@@ -1289,7 +1289,8 @@ const handleEdit = (product: any) => {
         {/* CATEGORY */}
         <div>
           <label className="text-slate-300 text-sm">Category</label>
-          <select
+          <input
+            type="text"
             value={editingProduct.category}
             onChange={(e) =>
               setEditingProduct((prev: any) => ({
@@ -1298,25 +1299,11 @@ const handleEdit = (product: any) => {
               }))
             }
             className="w-full p-2 bg-slate-800 rounded-lg border border-slate-700 text-white"
-          >
-            <option value="Sneakers">Sneakers</option>
-          </select>
+          />
+         
         </div>
 
-        {/* DESCRIPTION */}
-        <div>
-          <label className="text-slate-300 text-sm">Description</label>
-          <textarea
-            value={editingProduct.description}
-            onChange={(e) =>
-              setEditingProduct((prev: any) => ({
-                ...prev,
-                description: e.target.value,
-              }))
-            }
-            className="w-full p-2 bg-slate-800 rounded-lg border border-slate-700 text-white h-24 resize-none"
-          />
-        </div>
+     
 
         {/* IMAGE UPLOAD */}
         <div>
