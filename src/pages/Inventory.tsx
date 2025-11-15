@@ -57,6 +57,7 @@ export default function ProfessionalInventoryPOS() {
   const [sales, setSales] = useState<Sale[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [uploadStatus, setUploadStatus] = useState<{
     type: "idle" | "uploading" | "success" | "error";
     message: string;
@@ -393,8 +394,7 @@ export default function ProfessionalInventoryPOS() {
 
   // Placeholder for edit product
   const handleEdit = (product: Product) => {
-    console.log("Edit product:", product);
-    // Implement edit functionality here
+    setEditingProduct(product);
   };
 
   // Analytics
@@ -429,6 +429,37 @@ export default function ProfessionalInventoryPOS() {
       topSelling,
     };
   }, [sales, products]);
+
+  const updateProduct = async () => {
+    if (!editingProduct) return;
+
+    try {
+      const { error } = await supabase
+        .from("products")
+        .update({
+          name: editingProduct.name,
+          price: editingProduct.price,
+          stock: editingProduct.stock,
+        })
+        .eq("id", editingProduct.id);
+
+      if (error) throw error;
+
+      await fetchProducts();
+      setUploadStatus({
+        type: "success",
+        message: "Product updated successfully",
+      });
+
+      setEditingProduct(null);
+    } catch (error: any) {
+      console.error("Update product error:", error);
+      setUploadStatus({
+        type: "error",
+        message: `Failed to update product: ${error.message}`,
+      });
+    }
+  };
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-KE", {
@@ -1103,6 +1134,70 @@ export default function ProfessionalInventoryPOS() {
                   </div>
                 );
               })}
+            </div>
+          )}
+          {editingProduct && (
+            <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+              <div className="bg-slate-800 p-6 rounded-xl w-full max-w-md border border-slate-700">
+                <h2 className="text-xl font-bold text-white mb-4">
+                  Edit Product
+                </h2>
+
+                <input
+                  type="text"
+                  value={editingProduct.name}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      name: e.target.value,
+                    })
+                  }
+                  className="w-full mb-3 p-2 rounded bg-slate-700 text-white"
+                  placeholder="Product Name"
+                />
+
+                <input
+                  type="number"
+                  value={editingProduct.price}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      price: Number(e.target.value),
+                    })
+                  }
+                  className="w-full mb-3 p-2 rounded bg-slate-700 text-white"
+                  placeholder="Price"
+                />
+
+                <input
+                  type="number"
+                  value={editingProduct.stock}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      stock: Number(e.target.value),
+                    })
+                  }
+                  className="w-full mb-3 p-2 rounded bg-slate-700 text-white"
+                  placeholder="Stock"
+                />
+
+                <div className="flex justify-end gap-3 mt-4">
+                  <button
+                    onClick={() => setEditingProduct(null)}
+                    className="px-3 py-2 bg-slate-600 text-white rounded"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    onClick={updateProduct}
+                    className="px-3 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>
